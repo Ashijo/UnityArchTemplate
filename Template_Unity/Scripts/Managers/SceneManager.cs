@@ -19,6 +19,12 @@ public class SceneManager {
         }
     }
 
+    /// <summary>
+    /// This Function should only be called by the flow manager in this architecture
+    /// Use FlowManager.Instance.ChangeFlow() instead
+    /// </summary>
+    /// <param name="sceneName"></param>
+    /// <param name="handler"></param>
     public void LoadScene(string sceneName, InitToCall handler = null) {
         onSceneLoadedDelegate = handler ?? Empty;
         LoadScene(sceneName, DelegateCaller);
