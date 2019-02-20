@@ -1,32 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-
 public class SceneManager {
+    public delegate void InitToCall();
 
-    #region singleton
-    private static SceneManager instance;
-
-    private SceneManager() { }
-
-    public static SceneManager Instance {
-        get {
-            if (instance == null)
-                instance = new SceneManager();
-
-            return instance;
-        }
-    }
-    #endregion singleton
+    private UnityAction<Scene, LoadSceneMode> lastHandler;
+    private InitToCall onSceneLoadedDelegate;
 
     public string CurrentScene { get; private set; }
-
-    private UnityAction<Scene, LoadSceneMode> lastHandler = null;
-    public delegate void InitToCall();
-    private InitToCall onSceneLoadedDelegate;
 
     private void LoadScene(string sceneName, UnityAction<Scene, LoadSceneMode> handler = null) {
         if (lastHandler != null) UnityEngine.SceneManagement.SceneManager.sceneLoaded -= lastHandler;
@@ -39,7 +20,7 @@ public class SceneManager {
     }
 
     public void LoadScene(string sceneName, InitToCall handler = null) {
-        onSceneLoadedDelegate = handler;
+        onSceneLoadedDelegate = handler ?? Empty;
         LoadScene(sceneName, DelegateCaller);
     }
 
@@ -47,6 +28,25 @@ public class SceneManager {
         onSceneLoadedDelegate.Invoke();
     }
 
+    private void Empty() { }
 
+    #region singleton
 
+    private static SceneManager instance;
+
+    private SceneManager() {
+        onSceneLoadedDelegate = Empty;
+
+    }
+
+    public static SceneManager Instance {
+        get {
+            if (instance == null)
+                instance = new SceneManager();
+
+            return instance;
+        }
+    }
+
+    #endregion singleton
 }
